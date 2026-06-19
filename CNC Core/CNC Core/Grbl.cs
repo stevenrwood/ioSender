@@ -2394,9 +2394,9 @@ namespace CNC.Core
 
                             line = file.ReadLine();
                         }
-                    }
 
-                    file.Close();
+                        file.Close();   // only when actually opened (OpenFile can return null)
+                    }
                 }
                 catch
                 {
@@ -2514,10 +2514,10 @@ namespace CNC.Core
 
                             line = file.ReadLine();
                         }
-                    }
 
-                    file.Close();
-                }
+                        file.Close();   // only when actually opened - OpenFile returns null when the csv is
+                    }                   // missing (and no en-US fallback), which NRE'd here (caught, but the
+                }                       // debugger breaks on it at startup).
                 catch
                 {
                 }
@@ -2645,9 +2645,9 @@ namespace CNC.Core
 
                             line = file.ReadLine();
                         }
-                    }
 
-                    file.Close();
+                        file.Close();   // only when actually opened (OpenFile can return null)
+                    }
                 }
                 catch
                 {
