@@ -521,7 +521,9 @@ namespace CNC.Controls
                         break;
 
                     case GrblSettingDetails.DataTypes.BOOL:
-                        wCheckBox.IsChecked = value == "1";
+                        // Any non-"0" value is true (matches FormattedValue / the rest of the codebase);
+                        // a strict "== 1" left the box unchecked for booleans reported as other truthy values.
+                        wCheckBox.IsChecked = (value == null ? "0" : value.Trim()) != "0";
                         break;
 
                     case GrblSettingDetails.DataTypes.INTEGER:

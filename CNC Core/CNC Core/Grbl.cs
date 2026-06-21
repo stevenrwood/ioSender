@@ -2781,6 +2781,8 @@ namespace CNC.Core
             {
                 if (DataType == DataTypes.FLOAT)
                     value = GrblSettings.FormatFloat(value, Format);
+                else if (DataType == DataTypes.BOOL && !string.IsNullOrEmpty(value))
+                    value = value.Trim() != "0" ? "1" : "0";  // canonicalise: any non-"0" value is true
                 if (_value != value)
                 {
                     _value = value;
