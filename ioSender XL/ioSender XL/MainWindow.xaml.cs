@@ -167,6 +167,7 @@ namespace GCode_Sender
 
             // Build sidebar flyouts from the user's FlyoutItems list (Edit Main Page dialog).
             var seenFlyouts = new System.Collections.Generic.HashSet<string>();
+            var pinnedFlyouts = new System.Collections.Generic.List<UserControl>();
             foreach (var name in AppConfig.Settings.Base.FlyoutItems)
             {
                 if (!seenFlyouts.Add(name))     // guard against duplicate entries
@@ -216,8 +217,26 @@ namespace GCode_Sender
 
                 UIViewModel.SidebarItems.Add(new SidebarItem((ISidebarControl)flyout));
 
-                if (flyout is IPinnableFlyout pinned && pinned.Pinned)   // reopen pinned flyouts on launch
-                    flyout.Visibility = Visibility.Visible;
+                if (flyout is IPinnableFlyout pinned && pinned.Pinned)   // reopen pinned flyouts on launch (deferred below)
+                    pinnedFlyouts.Add(flyout);
+            }
+
+            // Reopen pinned flyouts on launch via a one-shot timer after startup settles. Setting Visibility
+            // inline (or at Loaded priority) was clobbered by the connect/activate work that runs right after,
+            // so the flyouts stayed closed.
+            if (pinnedFlyouts.Count > 0)
+            {
+                var showPinned = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = System.TimeSpan.FromMilliseconds(400)
+                };
+                showPinned.Tick += (s, te) =>
+                {
+                    showPinned.Stop();
+                    foreach (var f in pinnedFlyouts)
+                        f.Visibility = Visibility.Visible;
+                };
+                showPinned.Start();
             }
 
             UIViewModel.CurrentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex = 0]);
